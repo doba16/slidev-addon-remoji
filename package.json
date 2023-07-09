@@ -10,5 +10,11 @@
   "license": "ISC",
   "engines": {
     "slidev": ">=0.38"
+  },
+  "devDependencies": {
+    "@slidev/types": "0.42.4"
+  },
+  "dependencies": {
+    "@iconify/json": "^2.2.88"
   }
 }

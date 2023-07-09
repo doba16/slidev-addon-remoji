@@ -20,11 +20,27 @@ const fixer = (m, type) => {
   }
 }
 
-export default definePreparserSetup(({headmatter}) => {
-  const mapper = baseMap()
+export default definePreparserSetup(async (xxx: any) => {
+  
+  const {headmatter} = xxx
+
+  console.log("Data given to preparserSetup: ", xxx)
+  
+  const yyy = await import("@iconify/json/json/noto.json") as any
+  console.log("openmoji", yyy.chars)
+
+  const charMap = {}
+
+  Object.keys(yyy.chars).forEach(key => {
+    const c = String.fromCodePoint(...key.split("-").map(i => parseInt(i, 16)))
+    charMap[c] = yyy.chars[key]
+  })
+
+  // const mapper = baseMap()
   const type = headmatter?.addonsConfig?.remoji ?? 'openmoji'
-  fixer(mapper, type)
-  return [
+  // fixer(mapper, type)
+  
+  return (
     {
       transformRawLines(lines) {
         var ranges = [
@@ -37,13 +53,13 @@ export default definePreparserSetup(({headmatter}) => {
 
         const VOID = '​' // Zero-Width Space, to avoid merging a paragraph that would start with an emoji
         for (const i in lines) {
-          for (const k in mapper) {
-            lines[i] = lines[i].replace(re, (m) => mapper[m] ? `${VOID}<${type}-${mapper[m]}/>` : m);
+          for (const k in charMap) {
+            lines[i] = lines[i].replaceAll(k, charMap[k] ? `${VOID}<${type}-${charMap[k]}/>` : k);
           }
         }
       },
-    },
-  ];
+      name: "Emoji Transformer",
+    })
 });
 
 /*
